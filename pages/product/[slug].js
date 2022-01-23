@@ -1,18 +1,17 @@
 import React from "react";
 import { useRouter } from "next/router";
-import data from "../../utils/data";
 import NextLink from "next/link";
 import Layout from "../../components/Layout";
 import { Button, Card, Link, List, ListItem, Typography } from "@mui/material";
 import useStyles from "../../utils/styles";
 import { Grid } from "@mui/material";
 import Image from "next/image";
+import db from "../../utils/db";
+import Product from "../../models/Product";
 
-export default function ProductScreen() {
+export default function ProductScreen(props) {
+  const { product } = props;
   const classes = useStyles();
-  const router = useRouter();
-  const { slug } = router.query;
-  const product = data.products.find((p) => p.slug === slug);
   if (!product) {
     return <div>Product not found</div>;
   }
@@ -94,4 +93,17 @@ export default function ProductScreen() {
       </Grid>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { params } = context;
+  const { slug } = params;
+  await db.connect();
+  const product = Product.findOne({ slug }).lean(); // mongoose return objects from Document Class so we need to change it using lean function to JS object
+  await db.disconnect();
+  return {
+    props: {
+      product: db.convertDocToObj(product),
+    },
+  };
 }
