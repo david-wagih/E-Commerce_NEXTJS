@@ -22,8 +22,10 @@ import { Store } from "../utils/Store";
 import NextLink from "next/link";
 import Image from "next/image";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 function CartScreen() {
+  const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const {
     cart: { cartItems },
@@ -40,6 +42,10 @@ function CartScreen() {
 
   const removeItemHandler = async (item) => {
     dispatch({ type: "CART_REMOVE_ITEM", payload: item });
+  };
+
+  const checkoutHandler = () => {
+    router.push("/shipping");
   };
 
   return (
@@ -106,7 +112,11 @@ function CartScreen() {
                       </TableCell>
                       <TableCell align="right">${item.price}</TableCell>
                       <TableCell align="right">
-                        <Button variant="contained" color="secondary">
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => removeItemHandler(item)}
+                        >
                           x
                         </Button>
                       </TableCell>
@@ -128,10 +138,10 @@ function CartScreen() {
                 </ListItem>
                 <ListItem>
                   <Button
+                    onClick={checkoutHandler}
                     variant="contained"
                     color="primary"
                     fullWidth
-                    onClick={() => removeItemHandler(item)}
                   >
                     Check Out
                   </Button>
