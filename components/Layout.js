@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import NextLink from "next/link";
 import {
   AppBar,
@@ -12,14 +12,20 @@ import {
   Toolbar,
   Typography,
   Badge,
+  Button,
+  Menu,
+  MenuItem,
+  PopupState,
 } from "@mui/material";
 import useStyles from "../utils/styles";
 import { Store } from "../utils/Store";
 import Cookies from "js-cookie";
+import { useRouter } from "next/router";
 
 export default function Layout({ title, description, children }) {
+  const router = useRouter();
   const { state, dispatch } = useContext(Store);
-  const { darkMode, cart } = state;
+  const { darkMode, cart, userInfo } = state;
   const theme = createTheme({
     typography: {
       h1: {
@@ -48,6 +54,13 @@ export default function Layout({ title, description, children }) {
     dispatch({ type: darkMode ? "DARK_MODE_OFF" : "DARK_MODE_ON" });
     const newDarkMode = !darkMode;
     Cookies.set("darkMode", newDarkMode ? "ON" : "OFF");
+  };
+
+  const logoutClickHandler = () => {
+    dispatch({ type: "USER_LOGOUT" });
+    Cookies.remove("userInfo");
+    Cookies.remove("cartItems");
+    router.push("/");
   };
 
   return (
@@ -85,9 +98,38 @@ export default function Layout({ title, description, children }) {
                   )}
                 </Link>
               </NextLink>
-              <NextLink href="/login" passHref>
-                <Link>Login</Link>
-              </NextLink>
+              {userInfo ? (
+                <>
+                  <PopupState variant="popover" popupId="demo-popup-menu">
+                    {(popupState) => (
+                      <React.Fragment>
+                        <Button
+                          variant="contained"
+                          {...bindTrigger(popupState)}
+                          className={classes.navbarButton}
+                        >
+                          {userInfo.name}
+                        </Button>
+                        <Menu {...bindMenu(popupState)}>
+                          <MenuItem onClick={popupState.close}>
+                            Profile
+                          </MenuItem>
+                          <MenuItem onClick={popupState.close}>
+                            My account
+                          </MenuItem>
+                          <MenuItem onClick={logoutClickHandler}>
+                            Logout
+                          </MenuItem>
+                        </Menu>
+                      </React.Fragment>
+                    )}
+                  </PopupState>
+                </>
+              ) : (
+                <NextLink href="/login" passHref>
+                  <Link>Login</Link>
+                </NextLink>
+              )}
             </div>
           </Toolbar>
         </AppBar>
