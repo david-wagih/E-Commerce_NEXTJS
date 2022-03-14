@@ -1,4 +1,8 @@
 const classes = {
+  section: {
+    marginTop: 1,
+    marginBottom: 1,
+  },
   main: {
     marginTop: 2,
     minHeight: "80vh",
@@ -17,6 +21,9 @@ const classes = {
   brand: {
     fontWeight: "bold",
     fontSize: "1.5rem",
+  },
+  smallText: {
+    fontSize: "15px",
   },
 };
 
